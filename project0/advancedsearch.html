@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Advanced Search</title>
+        <style>
+            .topright {
+                float: right;
+                padding: 5px;
+            }
+            .center {
+                position: relative;
+                top: 50px;
+                text-align: left;
+            }
+            .row {
+                display: block;
+                padding: 5px;
+            }
+            input[type=text] {
+                position: absolute;
+                left: 200px;
+                width: 40%;
+                border-radius: 8px;
+                height: 20px;
+            }
+            .googlebtton {
+                position: absolute;
+                left: 200px;
+                background-color: #4285F4;
+                color: white;
+                border-radius: 4px;
+                font-size: 18px;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <div class="topright">
+                <a href="/index">Google Search</a>
+                <a href="/imagesearch">Google Image Search</a>  
+            </div>
+        </nav>
+        <div class="center">
+            <h3>Find pages with...</h1>
+            <div>
+                <form action="https://www.google.com/search">
+                    <div class="row">
+                        <label>all this words:</label><input type="text" name="as_q">
+                    </div>
+                    <div class="row">
+                        <label>this exact word or phrase:</label><input type="text" name="as_epq">
+                    </div>
+                    <div class="row">
+                        <label>any of these words:</label><input type="text" name="as_oq">
+                    </div>
+                    <div class="row">
+                        <label>none of these words:</label><input type="text" name="as_eq">
+                    </div>
+                    <div class="row">
+                        <input class="googlebtton" type="submit" value="Advanced Search">
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+    </body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Search</title>
+        <title>Image Search</title>
         <style>
             .topright {
                 float: right;
@@ -29,15 +29,15 @@
     <body>
         <nav>
             <div class="topright">
-                <a href="/imagesearch">Google Image Search</a>
+                <a href="/index">Google Search</a>
                 <a href="/advancedsearch">Google Advanced Search</a>
             </div>
         </nav>
         <div class="center">
             <form action="https://www.google.com/search">
                 <input type="text" name="q">
-                <input type="submit" value="Google Search" class="googlebtton">
-                <input type="submit" value="I’m feeling lucky" class="googlebtton" name="btnI">
+                <input type="hidden" name="tbm" value="isch">
+                <input type="submit" value="Google Image Search" class="googlebtton">
             </form>
         </div>
     </body>
