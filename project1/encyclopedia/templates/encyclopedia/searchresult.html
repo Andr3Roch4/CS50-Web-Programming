@@ -9,7 +9,7 @@
 
     <ul>
         {% for result in results %}
-            <a href="/{{ result }}"><li>{{ result }}</li></a>
+            <a href="{% url 'title' result %}"><li>{{ result }}</li></a>
         {% endfor %}
     </ul>
 

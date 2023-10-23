@@ -5,10 +5,16 @@
 {% endblock %}
 
 {% block body %}
-    <h1>{{ title }}</h1>
 
     <p>
-        {{ titletext }}
+        {{ titletext|safe }}
     </p>
+
+    <nav>
+        <form action="{% url 'editpage' %}">
+            <input type="hidden" name="title" value="{{ title }}">
+            <button>Edit {{ title }} page</button>
+        </form>
+    </nav>
 
 {% endblock %}
