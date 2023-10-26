@@ -1,0 +1,34 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Watchlist:</h2>
+    {% if items %}
+        <ul>
+        {% for item in items %}
+            {% if item.isclosed == False %}
+            <li>
+                <h4>
+                    <a href="{% url 'listing' item.id %}">{{ item.name }}</a>
+                </h4>
+                <div>
+                    <h4><b>Highest Bid: </b>${{ item.highestbid.bid }}</h4>
+                    <p>{{ item.description }}</p>
+                    <p>Created {{ item.time }}</p>
+                </div>
+            </li>
+            {% else %}
+            <li>
+                <h4>
+                    <a href="{% url 'listing' item.id %}">{{ item.name }}</a>
+                </h4>
+                <div>
+                    <h4><b>Auction for {{ item.name }} has been closed.</h4>
+                </div>
+            </li>
+            {% endif %}
+        {% endfor %}
+        </ul>   
+    {% else %}
+        <h5>No items on your watchlist yet.</h5>
+    {% endif %}
+{% endblock %}

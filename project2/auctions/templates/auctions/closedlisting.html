@@ -1,0 +1,12 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h3>{{ item.name }} is no longer available!</h3>
+    {% if won %}
+    <div>
+        <h3>Congratulations!</h3>
+        <h5>You have won {{ item.name }} auction, with a bid of ${{ item.highestbid.bid }}.</h5>            
+    </div>
+    {% endif %}
+    
+{% endblock %}

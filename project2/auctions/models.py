@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.timezone import datetime
+import datetime
 
 
 class User(AbstractUser):
@@ -25,41 +25,45 @@ class Categories(models.Model):
         ("Sports", "Sports"),
         ("Toys", "Toys"),
         ("Video", "Video"),
-        ("VideoGames", "Video Games")
+        ("VideoGames", "Video Games"),
+        ("None", "Not Specified")
     ]
-    category = models.CharField(max_length=64, choices=categories)
+    category = models.CharField(max_length=64, choices=categories, unique=True)
 
-class Listings(datetime, models.Model):
+class Listings(models.Model):
     name = models.CharField(max_length=64)
-    pricetag = models.PositiveIntegerField
-    description = models.TextField(max_length=200)
-    startingbid = models.PositiveIntegerField
-    image = models.URLField(max_length=200)
-    time = models.DateTimeField(auto_now_add=True)
-    category = models.ForeignKey(Categories, on_delete=models.PROTECT, related_name="item")
+    description = models.TextField(max_length=400)
+    startingbid = models.PositiveIntegerField()
+    image = models.URLField(max_length=200, blank=True)
+    time = models.DateTimeField(default=datetime.datetime.now())
+    category = models.ForeignKey(Categories, on_delete=models.PROTECT, related_name="item", blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings")
+    isclosed = models.BooleanField(default=False)
 
+    @property
     def highestbid(self):
-        if not self.bids:
-            return "No bid on this item yet."
+        if self.bids.all() == None:
+            return self.startingbid
         else:
-            highestbid = self.bids.order_by("bid").desc()[0]
+            highestbid = self.bids.all()
+            highestbid = highestbid.order_by("bid").last()
             return highestbid
 
-class Bids(datetime, models.Model):
-    bid = models.PositiveIntegerField
-    time = models.DateTimeField(auto_now_add=True)
+class Bids(models.Model):
+    bid = models.PositiveIntegerField()
+    time = models.DateTimeField(default=datetime.datetime.now())
     item = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="bids")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_bids")
 
-class Comments(datetime, models.Model):
+class Comments(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_comments")
-    time = models.DateTimeField(auto_now_add=True)
-    comment = models.TextField(max_length=200)
+    time = models.DateTimeField(default=datetime.datetime.now())
+    comment = models.TextField(max_length=400)
     item = models.ForeignKey(Listings, on_delete=models.CASCADE, related_name="comments")
 
-    class Watchlist(models.Model):
-        item = models.ManyToManyField(Listings, related_name="watchlist")
-        user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_watchlist")
+class Watchlist(models.Model):
+    item = models.ManyToManyField(Listings, blank=True, related_name="watchlist")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_watchlist")
 
 
 
