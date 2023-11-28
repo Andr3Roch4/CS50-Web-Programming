@@ -7,12 +7,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import User, Posts, Followers, Likes
 
 
 def index(request):
-    return render(request, "network/index.html")
+    return HttpResponseRedirect(reverse("allposts"))
 
 
 def login_view(request):
@@ -69,24 +70,23 @@ def register(request):
 
 def allposts(request):
     if request.method == "POST":
-        data = json.load(request.body)
-        if data.get("editcontent") and data.get("postid") is not None:
-            try:
-                user = User.objects.get(pk=request.user.id)
-            except:
-                return JsonResponse({"message": "Must be logged in to edit your post."}, status=401)
-            if data.get("postid") in user.posts.id.all():
-                post = Posts.objects.get(pk=data.get("postid"))
-                post.content = data.get("editcontent")
-                post.save()
-            else:
-                return JsonResponse({"message": "Can only edit your posts."}, status=402)
+        newcontent = request.POST["newcontent"]
+        postid = request.POST["postid"]
+        user = User.objects.get(pk=request.user.id)
+        userposts = Posts.objects.filter(user=user)
+        post = Posts.objects.get(pk=postid)
+        if post in userposts:
+            post.content = newcontent
+            post.save()
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            return HttpResponseRedirect(reverse("index"))
     else:
         posts = Posts.objects.all().order_by("-time")
         paginator = Paginator(posts, 10)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
-        return render(request, "network/allposts.html", {
+        return render(request, "network/index.html", {
             "posts": page_obj
         })
 
@@ -95,10 +95,11 @@ def newpost(request):
     # When new post form is submited, save post 
     if request.method == "POST":
         user = User.objects.get(pk=request.user.id)
-        post = Posts(user=user, content=request.POST["content"])
+        like = Likes()
+        like.save()
+        post = Posts(user=user, content=request.POST["content"], likes=Likes.objects.get(pk=like.id))
         post.save()
-        likes = Likes(post=Posts.objects.get(pk=post.id))
-        likes.save()
+        return HttpResponseRedirect(reverse("index"))
     else:
         return HttpResponseRedirect(reverse("index"))
     
@@ -106,13 +107,13 @@ def newpost(request):
 def profile(request, id):
     user = User.objects.get(pk=id)
     posts = user.posts.all().order_by("-time")
-    followers = Followers.followers.filter(user=user).count()
-    follows = Followers.follows.filter(user=user).count()
+    followers = user.followers.filter(user=user).count()
+    follows = user.follows.filter(user=user).count()
     paginator = Paginator(posts, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     return render(request, "network/profile.html", {
-        "user": user,
+        "poster": user,
         "posts": page_obj,
         "follows": follows,
         "followers": followers
@@ -120,30 +121,64 @@ def profile(request, id):
 
 @login_required
 def following(request):
-    user = User.objects.get(pk=request.user.id)
-    userfollows = user.follows.all()
-    posts = Posts.objects.filter(user__in=userfollows)
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-    return render(request, "network/allposts.html", {
-        "posts": page_obj
-    })
-
-@login_required
-def likes(request, id):
     if request.method == "PUT":
-        post = Posts.objects.get(pk=id)
         data = json.loads(request.body)
-        if data.get("like") is not None:
-            likes = Likes.objects.get(post=post)
-            likes.likes = + int(data.get("like"))
+        user = User.objects.get(pk=request.user.id)
+        userf = User.objects.get(pk=data.get("id"))
+        userfollows = user.follows.all()
+        if userf.id in userfollows.id:
+            user.follows.remove(userf)
+            user.save()
+            userf.followers.remove(user)
+            userf.save()
+            return JsonResponse({"message": f"Unfollowed {userf.username}"})
+        elif userf.id not in userfollows.id:
+            user.follows.add(userf)
+            user.save()
+            userf.followers.add(user)
+            userf.save()
+            return JsonResponse({"message": f"Now following {userf.username}"})
+    else:
+        user = User.objects.get(pk=request.user.id)
+        try:
+            follows = Followers.objects.get(user=user)
+            userfollows = follows.follows.all()
+            posts = Posts.objects.filter(user__in=userfollows)
+            paginator = Paginator(posts, 10)
+            page_number = request.GET.get("page")
+            page_obj = paginator.get_page(page_number)
+            return render(request, "network/following.html", {
+                "posts": page_obj
+            })
+        except:
+            return render(request, "network/following.html")
+
+@csrf_exempt
+@login_required
+def likes(request):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        post = Posts.objects.get(pk=data.get("id"))
+        if data.get("like") == "1" or "-1":
+            likes = Likes.objects.get(pk=post.likes.id)
+            likes.like = +int(data.get("like"))
             user = User.objects.get(pk=request.user.id)
-            if likes.users.get(id=user.id):
+            if data.get("like") == "-1":
                 likes.users.remove(user)
+                likes.save()
+                return JsonResponse({"data": likes.like}, safe=False)
             else:
                 likes.users.add(user)
-            likes.save()
-        return JsonResponse({"message": "Post liked!"}, status=201)
+                likes.save()
+                return JsonResponse({"data": likes.like}, safe=False)
+        else:
+            return HttpResponseRedirect(reverse("index"))
     else:
         return HttpResponseRedirect(reverse("index"))
+
+@login_required
+def editpost(request, id):
+    post = Posts.objects.get(pk=id)
+    return render(request, "network/editpost.html", {
+        "post": post
+    })

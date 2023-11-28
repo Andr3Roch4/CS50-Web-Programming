@@ -10,7 +10,8 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("allposts", views.allposts, name="allposts"),
     path("newpost", views.newpost, name="newpost"),
-    path("<str:id>", views.profile, name="profile"),
     path("following", views.following, name="following"),
-    path("like/<str:id>", views.likes, name="likes")
+    path("like", views.likes, name="likes"),
+    path("user/<str:id>", views.profile, name="profile"),
+    path("editpost/<str:id>", views.editpost, name="editpost")
 ]

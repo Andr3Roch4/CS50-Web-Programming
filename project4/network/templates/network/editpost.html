@@ -1,0 +1,10 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <form action="{% url 'allposts' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" value="{{ post.id }}" name="postid">
+        <textarea name="newcontent" id="newcontent" cols="30" rows="10">{{ post.content }}</textarea>
+        <input type="submit" value="Edit Post">
+    </form>
+{% endblock %}

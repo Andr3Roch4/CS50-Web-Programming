@@ -2,37 +2,16 @@
 {% load static %}
 
 {% block body %}
-    {% if user.is_authenticated %}
-    <div>
-        <form action="{% url 'newpost' %}" method="post">
-            {% csrf_token %}
-            <textarea name="content" id="content" cols="50" rows="5"></textarea>
-            <br>
-            <input type="submit" value="Post">
-        </form>
-    </div>
-    {% endif %}
+    {% if posts %}
     {% for post in posts %}
     <div class="posts">
         <a href="{% url 'profile' post.user.id %}"><h4>{{ post.user.username }}</h4></a>
         <p>{{ post.content }}</p>
         <p>{{ post.time }}</p>
-        <p>{{ post.likes.users }}</p>
-        {% if user.id == post.user.id %}
-        <a href="{% url 'editpost' post.id %}"><button>Edit Post</button></a>
-        {% endif %}
-        {% if user.is_authenticated %}
-        <div>
-            {% if user.id in post.likes.users.id %}
-            <p id="likepost" data-id="{{ post.id }}" data-like="-1">&#x1F9E1;<span id="postlikes">{{ post.likes.like }}</span></p>
-            {% else %}
-            <p id="likepost" data-id="{{ post.id }}" data-like="1">&#x1F90D;<span id="postlikes">{{ post.likes.like }}</span></p>
-            {% endif %}
-        </div>
+        {% if user.id in post.likes.users.id %}
+            <p id="likepost" data-id="{{ post.id }}" data-like="-1">&#x1F90D;</p><p id="postlikes">{{ post.likes.like }}</p>
         {% else %}
-        <div>
-            <p>&#x1F9E1; {{ post.post.like }}</p>
-        </div>
+            <p id="likepost" data-id="{{ post.id }}" data-like="1">&#x1F9E1;</p><p id="postlikes">{{ post.likes.like }}</p>
         {% endif %}
     </div>
     {% endfor %}
@@ -53,6 +32,11 @@
             {% endif %}
         </span>
     </div>
+    {% else %}
+    <div>
+        <h4>No posts done by your following yet.</h4>
+    </div>
+    {% endif %}
 {% endblock %}
 
 {% block script %}
