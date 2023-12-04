@@ -7,12 +7,12 @@
         <h2>{{ poster.username }}</h2>
     </div>
     <div>
-        <h4>Followers: {{ followers }}</h4>
-        <h4>Follows: {{ follows }}</h4>
+        <h4>Followers: {{ poster.following.followers.count }}</h4>
+        <h4>Follows: {{ poster.following.follows.count }}</h4>
     </div>
     {% if user.id != poster.id %}
     <button id="follow" data-id="{{ poster.id }}">
-        {% if poster.id in user.follows.id %}
+        {% if poster in user.following.follows.all %}
         Unfollow
         {% else %}
         Follow
@@ -24,15 +24,20 @@
         <p>{{ post.content }}</p>
         <p>{{ post.time }}</p>
         {% if user.is_authenticated %}
-            {% if user.id in post.likes.users.id %}
-            <p id="likepost" data-id="{{ post.id }}" data-like="-1">&#x1F90D;</p><p id="postlikes">{{ post.likes.like }}</p>
-            {% else %}
-            <p id="likepost" data-id="{{ post.id }}" data-like="1">&#x1F9E1;</p><p id="postlikes">{{ post.likes.like }}</p>
-            {% endif %}
+            <div>
+                {% if user in post.postlikes.users.all %}
+                <p class="likepost" id="likepost{{post.id}}" data-id="{{ post.id }}" data-like="-1">&#x1F9E1;<span id="postlikes{{post.id}}">{{ post.postlikes.like }}</span></p>
+                {% else %}
+                <p class="likepost" id="likepost{{post.id}}" data-id="{{ post.id }}" data-like="1">&#x1F90D;<span id="postlikes{{post.id}}">{{ post.postlikes.like }}</span></p>
+                {% endif %}
+            </div>
         {% else %}
-            <p>&#x1F9E1; {{ post.likes.like }}</p>
+            <div>
+                <p>&#x1F9E1; {{ post.postlikes.like }}</p>
+            </div>
         {% endif %}
     </div>
+    {% endfor %}
     <div class="pagination">
         <span class="step-links">
             {% if posts.has_previous %}
@@ -50,7 +55,7 @@
             {% endif %}
         </span>
     </div>
-    {% endfor %}
+    
 {% endblock %}
 
 {% block script %}

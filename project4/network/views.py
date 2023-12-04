@@ -58,6 +58,8 @@ def register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
+            following = Followers(user=User.objects.get(pk=user.id))
+            following.save()
         except IntegrityError:
             return render(request, "network/register.html", {
                 "message": "Username already taken."
@@ -68,17 +70,20 @@ def register(request):
         return render(request, "network/register.html")
 
 
+@csrf_exempt
 def allposts(request):
     if request.method == "POST":
-        newcontent = request.POST["newcontent"]
-        postid = request.POST["postid"]
+        data = json.loads(request.body)
+        newcontent = data.get("newcontent")
+        print(newcontent)
+        postid = data.get("postid")
         user = User.objects.get(pk=request.user.id)
         userposts = Posts.objects.filter(user=user)
         post = Posts.objects.get(pk=postid)
         if post in userposts:
             post.content = newcontent
             post.save()
-            return HttpResponseRedirect(reverse("index"))
+            return JsonResponse({"newcontent": newcontent})
         else:
             return HttpResponseRedirect(reverse("index"))
     else:
@@ -90,95 +95,93 @@ def allposts(request):
             "posts": page_obj
         })
 
-@login_required
+
+@login_required(login_url="login")
 def newpost(request):
     # When new post form is submited, save post 
     if request.method == "POST":
         user = User.objects.get(pk=request.user.id)
-        like = Likes()
-        like.save()
-        post = Posts(user=user, content=request.POST["content"], likes=Likes.objects.get(pk=like.id))
+        post = Posts(user=user, content=request.POST["content"])
         post.save()
+        likes = Likes(post=Posts.objects.get(pk=post.id))
+        likes.save()
+
         return HttpResponseRedirect(reverse("index"))
     else:
         return HttpResponseRedirect(reverse("index"))
-    
-@login_required
+
+
+@login_required(login_url="login")
 def profile(request, id):
     user = User.objects.get(pk=id)
     posts = user.posts.all().order_by("-time")
-    followers = user.followers.filter(user=user).count()
-    follows = user.follows.filter(user=user).count()
     paginator = Paginator(posts, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     return render(request, "network/profile.html", {
         "poster": user,
         "posts": page_obj,
-        "follows": follows,
-        "followers": followers
     })
 
-@login_required
+
+@csrf_exempt
+@login_required(login_url="login")
 def following(request):
     if request.method == "PUT":
         data = json.loads(request.body)
         user = User.objects.get(pk=request.user.id)
         userf = User.objects.get(pk=data.get("id"))
-        userfollows = user.follows.all()
-        if userf.id in userfollows.id:
-            user.follows.remove(userf)
-            user.save()
-            userf.followers.remove(user)
-            userf.save()
-            return JsonResponse({"message": f"Unfollowed {userf.username}"})
-        elif userf.id not in userfollows.id:
-            user.follows.add(userf)
-            user.save()
-            userf.followers.add(user)
-            userf.save()
-            return JsonResponse({"message": f"Now following {userf.username}"})
+        userfollows = user.following.follows.all()
+        if userf in userfollows:
+            follow = Followers.objects.get(user=user)
+            follow.follows.remove(userf)
+            follow.save()
+            following = Followers.objects.get(user=userf)
+            following.followers.remove(user)
+            return JsonResponse({"message": f"Unfollowed {userf.username}", "follow": "Follow"})
+        elif userf not in userfollows:
+            follow = Followers.objects.get(user=user)
+            follow.follows.add(userf)
+            follow.save()
+            following = Followers.objects.get(user=userf)
+            following.followers.add(user)
+            following.save()
+            return JsonResponse({"message": f"Now following {userf.username}", "follow": "Unfollow"})
     else:
         user = User.objects.get(pk=request.user.id)
-        try:
-            follows = Followers.objects.get(user=user)
-            userfollows = follows.follows.all()
-            posts = Posts.objects.filter(user__in=userfollows)
-            paginator = Paginator(posts, 10)
-            page_number = request.GET.get("page")
-            page_obj = paginator.get_page(page_number)
-            return render(request, "network/following.html", {
-                "posts": page_obj
-            })
-        except:
-            return render(request, "network/following.html")
+        follows = Followers.objects.get(user=user)
+        userfollows = follows.follows.all()
+        posts = Posts.objects.filter(user__in=userfollows)
+        paginator = Paginator(posts, 10)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        return render(request, "network/following.html", {
+            "posts": page_obj
+        })
+
 
 @csrf_exempt
-@login_required
+@login_required(login_url="login")
 def likes(request):
     if request.method == "PUT":
         data = json.loads(request.body)
+        print(data.get("id"), data.get("like"))
         post = Posts.objects.get(pk=data.get("id"))
         if data.get("like") == "1" or "-1":
-            likes = Likes.objects.get(pk=post.likes.id)
-            likes.like = +int(data.get("like"))
+            likes = Likes.objects.get(post__id=post.id)
+            likes.like += int(data.get("like"))
             user = User.objects.get(pk=request.user.id)
             if data.get("like") == "-1":
                 likes.users.remove(user)
-                likes.save()
-                return JsonResponse({"data": likes.like}, safe=False)
-            else:
+                liked = False
+            elif data.get("like") == "1":
                 likes.users.add(user)
-                likes.save()
-                return JsonResponse({"data": likes.like}, safe=False)
+                liked = True
+            likes.save()
+            print(liked)
+            return JsonResponse({"data": likes.like, "liked": liked}, safe=False)
         else:
             return HttpResponseRedirect(reverse("index"))
     else:
         return HttpResponseRedirect(reverse("index"))
 
-@login_required
-def editpost(request, id):
-    post = Posts.objects.get(pk=id)
-    return render(request, "network/editpost.html", {
-        "post": post
-    })

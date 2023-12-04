@@ -15,23 +15,24 @@
     {% for post in posts %}
     <div class="posts">
         <a href="{% url 'profile' post.user.id %}"><h4>{{ post.user.username }}</h4></a>
-        <p>{{ post.content }}</p>
+        <div class="content">
+            <p id="content{{post.id}}">{{ post.content }}</p>
+            {% if user.id == post.user.id %}
+            <button class="edit" id="edit{{post.id}}" data-id="{{post.id}}">Edit Post</button>
+            {% endif %}
+        </div>
         <p>{{ post.time }}</p>
-        <p>{{ post.likes.users }}</p>
-        {% if user.id == post.user.id %}
-        <a href="{% url 'editpost' post.id %}"><button>Edit Post</button></a>
-        {% endif %}
         {% if user.is_authenticated %}
         <div>
-            {% if user.id in post.likes.users.id %}
-            <p id="likepost" data-id="{{ post.id }}" data-like="-1">&#x1F9E1;<span id="postlikes">{{ post.likes.like }}</span></p>
+            {% if user in post.postlikes.users.all %}
+            <p class="likepost" id="likepost{{post.id}}" data-id="{{ post.id }}" data-like="-1">&#x1F9E1;<span id="postlikes{{post.id}}">{{ post.postlikes.like }}</span></p>
             {% else %}
-            <p id="likepost" data-id="{{ post.id }}" data-like="1">&#x1F90D;<span id="postlikes">{{ post.likes.like }}</span></p>
+            <p class="likepost" id="likepost{{post.id}}" data-id="{{ post.id }}" data-like="1">&#x1F90D;<span id="postlikes{{post.id}}">{{ post.postlikes.like }}</span></p>
             {% endif %}
         </div>
         {% else %}
         <div>
-            <p>&#x1F9E1; {{ post.post.like }}</p>
+            <p>&#x1F9E1; {{ post.postlikes.like }}</p>
         </div>
         {% endif %}
     </div>

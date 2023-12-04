@@ -8,11 +8,13 @@
         <a href="{% url 'profile' post.user.id %}"><h4>{{ post.user.username }}</h4></a>
         <p>{{ post.content }}</p>
         <p>{{ post.time }}</p>
-        {% if user.id in post.likes.users.id %}
-            <p id="likepost" data-id="{{ post.id }}" data-like="-1">&#x1F90D;</p><p id="postlikes">{{ post.likes.like }}</p>
+        <div>
+        {% if user in post.postlikes.users.all %}
+            <p class="likepost" id="likepost{{post.id}}" data-id="{{ post.id }}" data-like="-1">&#x1F9E1;<span id="postlikes{{post.id}}">{{ post.postlikes.like }}</span></p>
         {% else %}
-            <p id="likepost" data-id="{{ post.id }}" data-like="1">&#x1F9E1;</p><p id="postlikes">{{ post.likes.like }}</p>
+            <p class="likepost" id="likepost{{post.id}}" data-id="{{ post.id }}" data-like="1">&#x1F90D;<span id="postlikes{{post.id}}">{{ post.postlikes.like }}</span></p>
         {% endif %}
+        </div>
     </div>
     {% endfor %}
     <div class="pagination">
@@ -34,7 +36,7 @@
     </div>
     {% else %}
     <div>
-        <h4>No posts done by your following yet.</h4>
+        <h4>No posts in here yet.</h4>
     </div>
     {% endif %}
 {% endblock %}
