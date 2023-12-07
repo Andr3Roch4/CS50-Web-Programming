@@ -124,16 +124,16 @@ def listing(request, list_id):
         })
     elif request.method == "POST":
         user = User.objects.get(pk=request.user.id)
-        item_by_user = item.user.get(pk=request.user.id)
+        item_by_user = item.user
         try:
             watchlist = Watchlist.objects.get(user=user)
             item_in_watchlist = watchlist.item.get(pk=list_id)
         except:
-            item_in_watchlist = None
-        try:
+            item_in_watchlist = False
+        if item.user == user:
             item_by_user = user.listings.get(pk=list_id)
-        except:
-            item_by_user = None
+        else:
+            item_by_user = False
         if item.highestbid.bid >= int(request.POST["bid"]):
             number_bids = item.bids.count() - 1
             comments = item.comments.all()
@@ -223,16 +223,22 @@ def category(request):
         if form.is_valid():
             try:
                 category = Categories.objects.get(category=form.cleaned_data["category"])
-                items = category.item.all()
-                return render(request, "auctions/category.html", {
-                    "items": items,
-                    "category": category
-                })
+                items = category.item.all().exclude(isclosed=True)
+                if not items:
+                    return render(request, "auctions/category.html", {
+                        "form": form,
+                        "error_message": "No listings on selected category."
+                    })
+                else:
+                    return render(request, "auctions/category.html", {
+                        "items": items,
+                        "category": category
+                    })
             except:
                 return render(request, "auctions/category.html", {
-            "form": form,
-            "error_message": "No listings on selected category."
-        })
+                    "form": form,
+                    "error_message": "No listings on selected category."
+                })
     else:
         form = CategoriesForm()
         return render(request, "auctions/category.html", {
@@ -251,7 +257,7 @@ def mylistings(request):
 def mybids(request):
     user = User.objects.get(pk=request.user.id)
     user_items = user.listings.all()
-    bids = user.user_bids.exclude(item__in=user_items).all()
+    bids = user.user_bids.all().order_by("-time")
     return render(request, "auctions/mybids.html", {
         "bids": bids
     })

@@ -4,28 +4,27 @@
     <h2>Active Listings</h2>
 
     <div>
-        <ul>
         {% for list in listings %}
-            <li>
-                <h3>
-                    <a href="{% url 'listing' list.id %}">{{ list.name }}</a>
-                </h3>
-                <div>
+            <div class="listing">
+                <div class="listingheader">
+                    <img src="{{ list.image }}" alt="{{ list.name }}">
+                </div>
+                <div class="listingstatus">
+                    <p id="title">
+                        <a href="{% url 'listing' list.id %}">{{ list.name }}</a>
+                    </p>
                     {% if list.isclosed == True %}
-                    <h5>Auction is now closed.</h5>
-                    <h5>A bid of ${{ list.highestbid.bid }} has won!</h5>
+                    <p>Auction is now closed.</p>
+                    <p>A bid of ${{ list.highestbid.bid }} has won!</p>
                     {% else %}
-                    <img src="{{ list.image }}" alt="{{ list.name }}" height="80px">
-                    <h5><b>Starting Price: </b>${{ list.startingbid }}</h5>
-                    <h4><b>Highest Bid: </b>${{ list.highestbid.bid }}</h4>
+                    <span id="created">Created {{ list.time }}</span>
+                    <p>Starting Price: ${{ list.startingbid }}</p>
+                    <p><b>Highest Bid: </b>${{ list.highestbid.bid }}</p>
                     <p>{{ list.description }}</p>
-                    <p>Created {{ list.time }}</p>
                     {% endif %}
                 </div>
-            </li>
-            <br>
+            </div>
         {% endfor %}
-        </ul>
     </div>
 
 {% endblock %}

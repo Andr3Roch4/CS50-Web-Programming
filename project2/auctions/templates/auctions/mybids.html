@@ -1,34 +1,21 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>My Bids:</h2>
+    <h2>My Bids</h2>
 
     <div>
-        <ul>
-            {% for bid in bids %}
-                {% if bid.item.isclosed == False %}
-                <li>
-                    <div>
-                        <h4>
-                            <a href="{% url 'listing' bid.item.id %}">{{ bid.item.name }}</a>
-                        </h4>
-                        <h4><b>My Bid: </b>${{ bid.bid }}</h4>
-                        <h4><b>Current highest bid: </b>${{ bid.item.highestbid.bid }}</h4>
-                        <p>Bid on {{ bid.time }}.</p>
-                    </div>
-                </li>
-                {% else %}
-                <li>
-                    <h4>
+        {% for bid in bids %}
+            {% if bid.item.isclosed == False %}
+                <div class="bid">
+                    <p>
                         <a href="{% url 'listing' bid.item.id %}">{{ bid.item.name }}</a>
-                    </h4>
-                    <div>
-                        <h4><b>The auction for {{ bid.item.name }} has closed.</h4>
-                    </div>
-                </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
+                    </p>
+                    <p><b>My Bid: </b>${{ bid.bid }}</p>
+                    <p>Current highest bid: ${{ bid.item.highestbid.bid }}</p>
+                    <span id="created">Bid on {{ bid.time }}.</span>
+                </div>
+            {% endif %}
+        {% endfor %}
     </div>
     
 {% endblock %}

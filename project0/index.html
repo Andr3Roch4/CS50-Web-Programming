@@ -4,25 +4,42 @@
         <title>Search</title>
         <style>
             .topright {
+                position: static;
                 float: right;
                 padding: 5px;
+                padding-right: 20px;
+            }
+            a {
+                color: black;
             }
             .center {
-                margin: auto;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
                 text-align: center;
-                width: 40%;
-                padding: 50px;
             }
             .googlebtton {
-                background-color: #4285F4;
-                color: white;
+                padding: 20px;
+            }
+            input[type=submit] {
+                display: inline-block;
+                border: none;
+                height: 40px;
+                width: 150px;
+                background-color: lightgray;
                 border-radius: 4px;
-                font-size: 18px;
+                cursor: pointer;
+                margin: 10px;
             }
             input[type=text] {
-                width: 60%;
-                border-radius: 10px;
-                height: 30px;
+                border: 1px solid black;
+                box-shadow: none;
+                width: 580px;
+                border-radius: 24px;
+                height: 44px;
+                font-size: medium;
+                padding-left: 14px;
             }
         </style>
     </head>
@@ -36,8 +53,10 @@
         <div class="center">
             <form action="https://www.google.com/search">
                 <input type="text" name="q">
-                <input type="submit" value="Google Search" class="googlebtton">
-                <input type="submit" value="I’m feeling lucky" class="googlebtton" name="btnI">
+                <div class="googlebtton">
+                    <input type="submit" value="Google Search" >
+                    <input type="submit" value="I’m feeling lucky" name="btnI">
+                </div>
             </form>
         </div>
     </body>

@@ -1,38 +1,32 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>My Listings:</h2>
+    <h2>My Listings</h2>
 
     <div>
-        <ul>
-            {% for list in listings %}
+        {% for list in listings %}
+        <div class="listing">
+            <div class="listingheader">
+                <img src="{{ list.image }}" alt="{{ list.name }}">
+            </div>
+            <div class="listingstatus">
                 {% if list.isclosed == False %}
-                <li>
-                    <div>
-                        <h3>
-                            <a href="{% url 'listing' list.id %}">{{ list.name }}</a>
-                        </h3>
-                        <div>
-                            <img src="{{ list.url }}" alt="{{ list.name }}" width="50" height="50">
-                            <h5><b>Starting Price: </b>${{ list.startingbid }}</h5>
-                            <h4><b>Highest Bid: </b>${{ list.highestbid.bid }}</h4>
-                            <p>{{ list.description }}</p>
-                            <p>Created {{ list.time }}</p>
-                        </div>
-                    </div>
-                </li>
+                <p id="title">
+                    <a href="{% url 'listing' list.id %}">{{ list.name }}</a>
+                </p>
+                <span id="created">Created {{ list.time }}</span>
+                <p>Starting Price: ${{ list.startingbid }}</p>
+                <p><b>Highest Bid: </b>${{ list.highestbid.bid }}</p>
+                <p>{{ list.description }}</p>
                 {% else %}
-                <li>
-                    <h4>
-                        <a href="{% url 'listing' list.id %}">{{ list.name }}</a>
-                    </h4>
-                    <div>
-                        <h4><b>You have closed the auction for {{ list.name }} at ${{ list.highestbid.bid }}.</h4>
-                    </div>
-                </li>
+                <p>
+                    <a href="{% url 'listing' list.id %}">{{ list.name }}</a>
+                </p>
+                <p><b>You have closed the auction for {{ list.name }} at ${{ list.highestbid.bid }}.</b></p>
                 {% endif %}
-            {% endfor %}
-        </ul>            
+            </div>
+        </div>
+        {% endfor %}
     </div>
     
 {% endblock %}

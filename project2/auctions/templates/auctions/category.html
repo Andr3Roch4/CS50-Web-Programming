@@ -3,36 +3,29 @@
 {% block body %}
     
     {% if error_message %}
-    <h4>{{ error_message }}</h4>
+    <p>{{ error_message }}</p>
     {% endif %}
     {% if items %}
-        <h2>Items in {{ category.category }} Category: </h2>
+        <h2>Items in {{ category.category }} Category </h2>
         <div>
-            <ul>
             {% for item in items %}
                 {% if item.isclosed == False %}
-                <li>
-                    <h4>
-                        <a href="{% url 'listing' item.id %}">{{ item.name }}</a>
-                    </h4>
-                    <div>
-                        <h4><b>Highest Bid: </b>${{ item.highestbid.bid }}</h4>
+                <div class="listing">
+                    <div class="listingheader">
+                        <img src="{{ item.image }}" alt="{{ item.name }}">
+                    </div>
+                    <div class="listingstatus">
+                        <p id="title">
+                            <a href="{% url 'listing' item.id %}">{{ item.name }}</a>
+                        </p>
+                        <span id="created">Created {{ item.time }}</span>
+                        <p>Starting Price: ${{ item.startingbid }}</p>
+                        <p><b>Highest Bid: </b>${{ item.highestbid.bid }}</p>
                         <p>{{ item.description }}</p>
-                        <p>Created {{ item.time }}</p>
                     </div>
-                </li>
-                {% else %}
-                <li>
-                    <h4>
-                        <a href="{% url 'listing' item.id %}">{{ item.name }}</a>
-                    </h4>
-                    <div>
-                        <h4><b>Auction for {{ item.name }} has been closed.</h4>
-                    </div>
-                </li>
+                </div>
                 {% endif %}
             {% endfor %}
-            </ul>
         </div>
         
 

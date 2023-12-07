@@ -11,4 +11,4 @@ class CategoriesForm(forms.Form):
     category = forms.ChoiceField(choices=Categories.categories, required=True, label="Select category:")
 
 class CommentForm(forms.Form):
-    comment = forms.CharField(max_length=400, label="Add comment:", widget=forms.Textarea)
+    comment = forms.CharField(max_length=200, label="Add your comment:", widget=forms.Textarea)

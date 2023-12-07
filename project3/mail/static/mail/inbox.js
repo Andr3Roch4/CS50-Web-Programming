@@ -155,7 +155,6 @@ function load_mailbox(mailbox) {
   .then(emails => {
     emails.forEach(email => {
       const emaildiv = document.createElement('div');
-      emaildiv.style.border = 'solid';
       if (mailbox === 'sent') {
         const span1 = document.createElement('span');
         const span2 = document.createElement('span');

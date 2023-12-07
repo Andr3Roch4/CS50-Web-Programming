@@ -4,8 +4,13 @@
         <title>Advanced Search</title>
         <style>
             .topright {
+                position: static;
                 float: right;
                 padding: 5px;
+                padding-right: 20px;
+            }
+            a {
+                color: black;
             }
             .center {
                 padding: 10px;
@@ -13,22 +18,28 @@
             }
             .row {
                 display: block;
-                padding: 5px;
+                height: 25px;
+                padding: 10px;
             }
             input[type=text] {
                 position: absolute;
                 left: 200px;
                 width: 40%;
-                border-radius: 8px;
-                height: 20px;
+                border-radius: 4px;
+                height: 25px;
+                border: 1px solid black;
+                box-shadow: none;
+                padding-left: 6px;
             }
             .googlebtton {
-                position: absolute;
-                left: 200px;
-                background-color: #4285F4;
-                color: white;
+                display: inline-block;
+                border: none;
+                height: 40px;
+                width: 150px;
+                background-color: lightgray;
                 border-radius: 4px;
-                font-size: 18px;
+                cursor: pointer;
+                margin: 10px;
             }
         </style>
     </head>

@@ -31,7 +31,7 @@ class Categories(models.Model):
     category = models.CharField(max_length=64, choices=categories, unique=True)
 
 class Listings(models.Model):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=200)
     description = models.TextField(max_length=400)
     startingbid = models.PositiveIntegerField()
     image = models.URLField(max_length=200, blank=True)

@@ -11,7 +11,22 @@
     <div>
         <img src="{{ item.image }}" alt="{{ item.name }}" height="200px">
         <p>Category: {{ item.category.category }}</p>
+        {% if user.is_authenticated %}
+        <form action="{% url 'watchlist' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" value="{{ item.id }}" name="id">
+            {% if item_in_watchlist %}
+            <input type="submit" value="Remove from Watchlist">
+            {% else %}
+            <input type="submit" value="Add to Watchlist">
+            {% endif %}
+        </form>
+        {% endif %}
         <h6>{{ item.description }}</h6>
+    </div>
+    <div>
+        <span id="created">Item listed by {{ item.user.username }} on {{item.time}}.</span>
+        <p><b>Starting Price: </b>${{ item.startingbid }}</p>
         {% if user.is_authenticated %}
             {% if item_by_user %}
             <form action="{% url 'removelisting' %}" method="post">
@@ -20,23 +35,10 @@
                 <input type="submit" value="Close Auction">
             </form>
             {% endif %}
-            <form action="{% url 'watchlist' %}" method="post">
-                {% csrf_token %}
-                <input type="hidden" value="{{ item.id }}" name="id">
-                {% if item_in_watchlist %}
-                    <input type="submit" value="Remove from Watchlist">
-                {% else %}
-                    <input type="submit" value="Add to Watchlist">
-                {% endif %}
-            </form>
         {% endif %}
-    </div>
-    <div>
-        <h5><b>Starting Price: </b>${{ item.startingbid }}</h5>
-        <h6>There have been {{ bids }} bids made on this item.</h6>
-        <h6>Item listed by {{ item.user.username }}.</h6>
         <h4><b>Highest Bid: </b>${{ item.highestbid.bid }}</h4>
-        <h6>Bid by {{ item.highestbid.user.username }}.</h6>
+        <h6>Highest Bid by {{ item.highestbid.user.username }}.</h6>
+        <p>There have been {{ bids }} bids made on this item.</p>
 
         {% if user.is_authenticated %}
         <form method="post">
@@ -46,36 +48,34 @@
         </form>
         {% endif %}
         {% if error_message %}
-            <h5>{{ error_message }}</h5>
+            <p>{{ error_message }}</p>
         {% endif %}
     </div>
     {% if comments %}
-        <div>
+        <div class="comments">
             <h3>
                 Comments:
             </h3>
-            <ul>
             {% for comment in comments %}
-                <li>
+                <div class="comment">
                     <p>
                         {{ comment.comment }}
                     </p>
-                    <p>
+                    <span id="created">
                         {{ comment.time }} by {{ comment.user }}
-                    </p>
-                </li>
+                    </span>
+                </div>
             {% endfor %}
-            </ul>
         </div>
     {% else %}
-        <div>
-            <h3>
+        <div class="comments">
+            <h4>
                 No Comments yet.
-            </h3>
+            </h4>
         </div>
     {% endif %}
     {% if user.is_authenticated %}
-    <div>
+    <div class="addcomment">
         <form action="{% url 'comment' %}" method="post">
             {% csrf_token %}
             {{ form }}

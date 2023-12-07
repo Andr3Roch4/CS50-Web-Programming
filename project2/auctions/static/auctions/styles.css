@@ -1,3 +1,85 @@
 body {
     padding: 10px;
 }
+
+.listing {
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    display: flex;
+    padding: 10px;
+    height: 300px;
+    margin: 20px;
+}
+
+.listingheader {
+    position: relative;
+}
+
+.listingstatus {
+    position: absolute;
+    left: 30%;
+}
+
+.listingheader img {
+    height: 100%;
+ }
+
+ #created {
+    font-size: x-small;
+    color: gray;
+ }
+
+ #title {
+    font-size: large;
+ }
+
+ .comments {
+    padding: 10px;
+    padding-top: 20px;
+ }
+
+ .comment {
+    border: 1px solid gray;
+    margin: 10px;
+    border-radius: 10px;
+    padding: 10px;
+ }
+
+ .comments p {
+    margin-left: 5px;
+ }
+
+ .addcomment {
+    height: 100px;
+ }
+
+ .addcomment form textarea {
+    height: 50px;
+    width: 100%;
+ }
+
+ .bid {
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    padding: 10px;
+    height: 100px;
+    margin: 20px;
+ }
+
+ .bid p {
+    font-size: smaller;
+    margin: 1px;
+ }
+
+.list {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 10px;
+}
+
+ .list form {
+    width: 300px;
+ }
